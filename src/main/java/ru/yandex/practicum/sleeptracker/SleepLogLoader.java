@@ -1,9 +1,6 @@
 package ru.yandex.practicum.sleeptracker;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -13,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class SleepLogLoader {
 
-    public static List<SleepingSession> LoadDataFromFile(String filename) {
+    public static List<SleepingSession> loadDataFromFile(String filename) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
 

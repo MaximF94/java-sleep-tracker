@@ -11,7 +11,7 @@ public class SleepTrackerApp {
     public static void main(String[] args) {
         ClassLoader classLoader = SleepLogLoader.class.getClassLoader();
         String filename = classLoader.getResource("sleep_log.txt").getFile();
-        List<SleepingSession> sleepingSessions = SleepLogLoader.LoadDataFromFile(filename);
+        List<SleepingSession> sleepingSessions = SleepLogLoader.loadDataFromFile(filename);
 
         List<Function> functions = new ArrayList<>();
         functions.add(new SleepCountFunction());
