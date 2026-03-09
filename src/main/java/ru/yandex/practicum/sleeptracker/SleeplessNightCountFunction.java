@@ -5,12 +5,9 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
-public class SleeplessNightCountFunction implements Function<List<SleepingSession>, SleepAnalysisResult> {
+public class SleeplessNightCountFunction implements SleepAnalysisResultFunction {
 
-    private static final LocalTime NIGHT_START = LocalTime.of(0, 0);
-    private static final LocalTime NIGHT_END = LocalTime.of(6, 0);
     private static final LocalTime FIRST_SESSION_START_TIME = LocalTime.of(12, 0);
 
     @Override
@@ -19,13 +16,6 @@ public class SleeplessNightCountFunction implements Function<List<SleepingSessio
         if (sleepingSessions == null || sleepingSessions.isEmpty()) {
             return new SleepAnalysisResult("Количество бессонных ночей: ", "Недостаточно данных");
         }
-
-        Predicate<SleepingSession> isSleepful = s -> {
-            LocalTime start = s.getStartSleep().toLocalTime();
-            LocalTime end = s.getEndSleep().toLocalTime();
-            return s.getStartSleep().toLocalDate().isBefore(s.getEndSleep().toLocalDate()) ||
-                    (start.isBefore(NIGHT_END) && end.isAfter(NIGHT_START));
-        };
 
         Function<SleepingSession, LocalDate> toNightDate = s ->
                 FIRST_SESSION_START_TIME.isAfter(s.getStartSleep().toLocalTime())
@@ -41,7 +31,7 @@ public class SleeplessNightCountFunction implements Function<List<SleepingSessio
         }
 
         long sleepNightsCount = sleepingSessions.stream()
-                .filter(isSleepful)
+                .filter(SleepUtils::isNightSession)
                 .map(toNightDate)
                 .distinct()
                 .count();

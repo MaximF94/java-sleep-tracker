@@ -216,7 +216,7 @@ public class SleepTrackerAppTest {
     }
 
     @Test
-    public void testSleeplessNightStartMultipleSessionsInOneDay() {
+    public void testSleeplessNightSessionsInOneDay() {
         SleeplessNightCountFunction function = new SleeplessNightCountFunction();
 
         //Лег и проснулся до 12 и после 12
@@ -230,6 +230,52 @@ public class SleepTrackerAppTest {
         SleepAnalysisResult result = function.apply(sleepingSessions);
 
         assertEquals(0L, result.getResult());
+    }
+
+    @Test
+    public void testSleeplessNightInDifferentMonth() {
+        SleeplessNightCountFunction function = new SleeplessNightCountFunction();
+
+        //Две сессии сна с переходом в следующий месяц
+        List<SleepingSession> sleepingSessions = List.of(
+                new SleepingSession(LocalDateTime.of(2025, 10, 31, 4, 30),
+                        LocalDateTime.of(2025, 10, 31, 11, 0), SleepQuality.GOOD),
+                new SleepingSession(LocalDateTime.of(2025, 11, 1, 1, 30),
+                        LocalDateTime.of(2025, 11, 1, 11, 0), SleepQuality.GOOD)
+        );
+
+        SleepAnalysisResult result = function.apply(sleepingSessions);
+
+        assertEquals(0L, result.getResult());
+    }
+
+    @Test
+    public void testSleeplessNightFirstSessionStartsAtMidnight() {
+        SleeplessNightCountFunction function = new SleeplessNightCountFunction();
+
+        //Две сессии сна, где первая сессия начинается после 00:00
+        List<SleepingSession> sleepingSessions = List.of(
+                new SleepingSession(LocalDateTime.of(2025, 10, 2, 0, 30),
+                        LocalDateTime.of(2025, 10, 2, 8, 0), SleepQuality.GOOD),
+                new SleepingSession(LocalDateTime.of(2025, 10, 2, 23, 30),
+                        LocalDateTime.of(2025, 10, 3, 7, 30), SleepQuality.GOOD)
+        );
+
+        SleepAnalysisResult result = function.apply(sleepingSessions);
+
+        assertEquals(0L, result.getResult());
+    }
+
+    @Test
+    public void testSleeplessNightIsNull() {
+        SleeplessNightCountFunction function = new SleeplessNightCountFunction();
+
+        //Сессии сна отсутствуют
+        List<SleepingSession> sleepingSessions = new ArrayList<>();
+
+        SleepAnalysisResult result = function.apply(sleepingSessions);
+
+        assertEquals("Недостаточно данных", result.getResult());
     }
 
     @Test
@@ -271,4 +317,26 @@ public class SleepTrackerAppTest {
         assertEquals("Жаворонок", result.getResult());
 
     }
+
+    @Test
+    public void testUserTypeFunctionIsPigeon() {
+        UserTypeFunction function = new UserTypeFunction();
+
+        //лёг до 22:00 и проснулся до 7:00 первые 2 дня и последующие после 22:00 и проснулся после 7:00.
+        List<SleepingSession> sleepingSessions = List.of(
+                new SleepingSession(LocalDateTime.of(2025, 10, 19, 21, 0),
+                        LocalDateTime.of(2025, 10, 20, 6, 0), SleepQuality.NORMAL),
+                new SleepingSession(LocalDateTime.of(2025, 10, 20, 13, 30),
+                        LocalDateTime.of(2025, 10, 20, 16, 0), SleepQuality.NORMAL),
+                new SleepingSession(LocalDateTime.of(2025, 10, 20, 23, 30),
+                        LocalDateTime.of(2025, 10, 21, 8, 0), SleepQuality.NORMAL),
+                new SleepingSession(LocalDateTime.of(2025, 10, 21, 23, 30),
+                        LocalDateTime.of(2025, 10, 22, 8, 0), SleepQuality.NORMAL)
+        );
+
+        SleepAnalysisResult result = function.apply(sleepingSessions);
+
+        assertEquals("Голубь", result.getResult());
+    }
+
 }

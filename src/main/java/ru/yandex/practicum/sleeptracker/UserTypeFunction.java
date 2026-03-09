@@ -4,12 +4,9 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class UserTypeFunction implements Function<List<SleepingSession>, SleepAnalysisResult> {
-    private static final LocalTime NIGHT_START = LocalTime.of(0, 0);
-    private static final LocalTime NIGHT_END = LocalTime.of(6, 0);
+public class UserTypeFunction implements SleepAnalysisResultFunction {
 
     private static final LocalTime OWL_START = LocalTime.of(23, 0);
     private static final LocalTime OWL_END = LocalTime.of(9, 0);
@@ -24,12 +21,6 @@ public class UserTypeFunction implements Function<List<SleepingSession>, SleepAn
             return new SleepAnalysisResult("Тип пользователя: ", "Недостаточно данных");
         }
 
-        Predicate<SleepingSession> isNightSession = s -> {
-            LocalTime start = s.getStartSleep().toLocalTime();
-            LocalTime end = s.getEndSleep().toLocalTime();
-            return s.getStartSleep().toLocalDate().isBefore(s.getEndSleep().toLocalDate()) ||
-                    (start.isBefore(NIGHT_END) && end.isAfter(NIGHT_START));
-        };
 
         Function<SleepingSession, UserType> nightClassifier = s -> {
             LocalTime start = s.getStartSleep().toLocalTime();
@@ -46,7 +37,7 @@ public class UserTypeFunction implements Function<List<SleepingSession>, SleepAn
         };
 
         Map<UserType, Long> typeCounts = sleepingSessions.stream()
-                .filter(isNightSession)
+                .filter(SleepUtils::isNightSession)
                 .collect(Collectors.groupingBy(
                         nightClassifier,
                         Collectors.counting()

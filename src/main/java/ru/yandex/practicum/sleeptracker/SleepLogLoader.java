@@ -1,5 +1,8 @@
 package ru.yandex.practicum.sleeptracker;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -14,8 +17,8 @@ public class SleepLogLoader {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
 
-        try {
-            return Files.lines(Paths.get(filename))
+        try (BufferedReader fileReader = new BufferedReader(new FileReader(filename))) {
+            return fileReader.lines()
                     .map(line -> line.split(";"))
                     .filter(parts -> parts.length == 3)
                     .map(parts -> new SleepingSession(
@@ -24,7 +27,6 @@ public class SleepLogLoader {
                             SleepQuality.valueOf(parts[2]))
                     )
                     .collect(Collectors.toList());
-
         } catch (IOException ex) {
             ex.printStackTrace();
             return List.of();

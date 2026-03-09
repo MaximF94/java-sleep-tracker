@@ -1,9 +1,8 @@
 package ru.yandex.practicum.sleeptracker;
 
 import java.util.List;
-import java.util.function.Function;
 
-public class BadSessionDuration implements Function<List<SleepingSession>, SleepAnalysisResult> {
+public class BadSessionDuration implements SleepAnalysisResultFunction {
     @Override
     public SleepAnalysisResult apply(List<SleepingSession> sleepingSessions) {
         if (sleepingSessions == null || sleepingSessions.isEmpty()) {
